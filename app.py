@@ -14,29 +14,62 @@ load_dotenv()
 
 
 machine = TocMachine(
-    states=["user", "state1", "state2"],
+    states=["start" , "makelist" ,"newitemtolist" ,"chooseunit" ,"inputbudget" , "shopping" ,"finish_remind" ,"dangerous_remind" , "endshopping" ,"callNcheck"],
     transitions=[
         {
             "trigger": "advance",
-            "source": "user",
-            "dest": "state1",
-            "conditions": "is_going_to_state1",
+            "source": "start",
+            "dest": "makelist",
+            "conditions": "is_going_to_makelist",
+        },
+		##TODO
+
+        {
+            "trigger": "advance",
+            "source": "shopping",
+            "dest": "finish_remind",
+            "conditions": "is_going_to_finish_remind",
         },
         {
             "trigger": "advance",
-            "source": "user",
-            "dest": "state2",
-            "conditions": "is_going_to_state2",
+            "source": "shopping",
+            "dest": "dangerous_remind",
+            "conditions": "is_going_to_dangerous_remind",
         },
-        {"trigger": "go_back", "source": ["state1", "state2"], "dest": "user"},
+        {
+            "trigger": "advance",
+            "source": "finish_remind",
+            "dest": "endshopping",
+            "conditions": "is_going_to_endshopping",
+        },
+        {
+            "trigger": "advance",
+            "source": "dangerous_remind",
+            "dest": "callNcheck",
+            "conditions": "is_going_to_callNcheck",
+        },
+        {
+            "trigger": "advance",
+            "source": "callNcheck",
+            "dest": "shopping",
+            "conditions": "after_checking_going_to_shopping",
+        },
+
+
+
+		'''
+        {	"trigger": "go_back",
+			"source": ["state1", "state2"], 
+			"dest": "start"
+		},
+		'''
     ],
-    initial="user",
+    initial="start",
     auto_transitions=False,
     show_conditions=True,
 )
 
 app = Flask(__name__, static_url_path="")
-
 
 # get channel_secret and channel_access_token from your environment variable
 channel_secret = os.getenv("LINE_CHANNEL_SECRET", None)
@@ -102,6 +135,8 @@ def webhook_handler():
             continue
         print(f"\nFSM STATE: {machine.state}")
         print(f"REQUEST BODY: \n{body}")
+
+		##TODO
         response = machine.advance(event)
         if response == False:
             send_text_message(event.reply_token, "Not Entering any State")
