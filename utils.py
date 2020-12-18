@@ -14,10 +14,27 @@ def send_text_message(reply_token, text):
     return "OK"
 
 
-"""
-def send_image_url(id, img_url):
-    pass
+def send_button_message(reply_token, title, text, btn, url):
+    line_bot_api = LineBotApi(channel_access_token)
+    message = TemplateSendMessage(
+        alt_text='button template',
+        template = ButtonsTemplate(
+            title = title,
+            text = text,
+            thumbnail_image_url = url,
+            actions = btn
+        )
+    )
+    line_bot_api.reply_message(reply_token, message)
 
-def send_button_message(id, text, buttons):
-    pass
-"""
+    return "OK"
+
+def send_image_message(reply_token, url):
+    line_bot_api = LineBotApi(channel_access_token)
+    message = ImageSendMessage(
+        original_content_url = url,
+        preview_image_url = url
+    )
+    line_bot_api.reply_message(reply_token, message)
+
+    return "OK"
