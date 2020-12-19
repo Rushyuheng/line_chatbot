@@ -14,55 +14,172 @@ load_dotenv()
 
 
 machine = TocMachine(
-    states=["start" , "makelist" ,"newitemtolist" ,"chooseunit" ,"inputbudget" , "shopping" ,"finish_remind" ,"dangerous_remind" , "endshopping" ,"callNcheck"],
+    states=["start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputbudget" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","finishremind" ,"dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
     transitions=[
+		# start to makelist
         {
             "trigger": "advance",
             "source": "start",
             "dest": "makelist",
             "conditions": "is_going_to_makelist",
         },
-		##TODO
+
+		#makelist to shopping
+        {
+            "trigger": "advance",
+            "source": "makelist",
+            "dest": "newitemtolist",
+            "conditions": "is_going_to_newitemtolist",
+        },
+
+		#cycle for adding new item
+        {
+            "trigger": "advance",
+            "source": "newitemtolist",
+            "dest": "inputitemname",
+            "conditions": "is_going_to_inputitemname",
+        },
+        {
+            "trigger": "advance",
+            "source": "inputitemname",
+            "dest": "chooseunit",
+            "conditions": "is_going_to_chooseunit",
+        },
+        {
+            "trigger": "advance",
+            "source": "chooseunit",
+            "dest": "inputbudget",
+            "conditions": "is_going_to_inputbudget",
+        },
+        {
+            "trigger": "advance",
+            "source": "inputbudget",
+            "dest": "makelist",
+            "conditions": "confirm_add_item",
+        },
+		#end cycle
 
         {
             "trigger": "advance",
             "source": "shopping",
-            "dest": "finish_remind",
-            "conditions": "is_going_to_finish_remind",
+            "dest": "showlist",
+            "conditions": "is_going_to_showlist",
         },
+        {
+            "trigger": "advance",
+            "source": "showlist",
+            "dest": "shopping",
+            "conditions": "back_to_shopping",
+        },
+		# add new buy item cycle
         {
             "trigger": "advance",
             "source": "shopping",
-            "dest": "dangerous_remind",
-            "conditions": "is_going_to_dangerous_remind",
+            "dest": "addnewbuyitem",
+            "conditions": "is_going_to_addnewbuyitem",
         },
         {
             "trigger": "advance",
-            "source": "finish_remind",
+            "source": "addnewbuyitem",
+            "dest": "buyitemname",
+            "conditions": "is_going_to_buyitemname",
+        },
+        {
+            "trigger": "advance",
+            "source": "buyitemname",
+            "dest": "realexpense",
+            "conditions": "is_going_to_realexpense",
+        },
+        {
+            "trigger": "advance",
+            "source": "realexpense",
+            "dest": "shopping",
+            "conditions": "back_to_shopping",
+        },
+		# end cycle
+		
+		#shopping to endshopping
+        {
+            "trigger": "advance",
+            "source": "shopping",
             "dest": "endshopping",
             "conditions": "is_going_to_endshopping",
         },
+
+		#realexpense node
         {
             "trigger": "advance",
-            "source": "dangerous_remind",
+            "source": "realexpense",
+            "dest": "shopping",
+            "conditions": "check_and_goto_shopping",
+        },
+        {
+            "trigger": "advance",
+            "source": "realexpense",
+            "dest": "finishremind",
+            "conditions": "is_going_to_finishremind",
+        },
+        {
+            "trigger": "advance",
+            "source": "realexpense",
+            "dest": "dangerous",
+            "conditions": "overbudget",
+        },
+		#end of node
+
+		#finishremind node
+        {
+            "trigger": "advance",
+            "source": "finishremind",
+            "dest": "shopping",
+            "conditions": "back_to_shopping",
+        },
+        {
+            "trigger": "advance",
+            "source": "finishremind",
+            "dest": "endshopping",
+            "conditions": "is_going_to_endshopping",
+        },
+		#end of node
+		
+		#endshopping node
+        {
+            "trigger": "advance",
+            "source": "endshopping",
+            "dest": "dangerous",
+            "conditions": "warning",
+        },
+
+        {
+            "trigger": "advance",
+            "source": "endshopping",
+            "dest": "goodend",
+            "conditions": "is_going_to_goodend",
+        },
+		#end of node
+		
+		#dangerous to callNcheck
+        {
+            "trigger": "advance",
+            "source": "dangerous",
             "dest": "callNcheck",
             "conditions": "is_going_to_callNcheck",
         },
+		
+		#callNcheck to shopping
         {
             "trigger": "advance",
             "source": "callNcheck",
             "dest": "shopping",
-            "conditions": "after_checking_going_to_shopping",
+            "conditions": "back_to_shopping",
         },
-
-
-
-		'''
+		
+		# restart
         {	"trigger": "go_back",
-			"source": ["state1", "state2"], 
+			"source": ["start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputbudget" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","finishremind" ,"dangerous" , "endshopping" ,"goodend" ,"callNcheck"], 
 			"dest": "start"
 		},
-		'''
+		
     ],
     initial="start",
     auto_transitions=False,
