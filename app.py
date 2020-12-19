@@ -14,7 +14,7 @@ load_dotenv()
 
 
 machine = TocMachine(
-    states=["start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputbudget" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","finishremind" ,"dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
+    states=["start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","finishremind" ,"dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
     transitions=[
 		# start to makelist
         {
@@ -28,11 +28,18 @@ machine = TocMachine(
         {
             "trigger": "advance",
             "source": "makelist",
+            "dest": "shopping",
+            "conditions": "is_going_to_shopping",
+        },
+
+		#cycle for adding new item
+        {
+            "trigger": "advance",
+            "source": "makelist",
             "dest": "newitemtolist",
             "conditions": "is_going_to_newitemtolist",
         },
 
-		#cycle for adding new item
         {
             "trigger": "advance",
             "source": "newitemtolist",
@@ -48,6 +55,12 @@ machine = TocMachine(
         {
             "trigger": "advance",
             "source": "chooseunit",
+            "dest": "inputnumber",
+            "conditions": "is_going_to_inputnumber",
+        },
+        {
+            "trigger": "advance",
+            "source": "inputnumber",
             "dest": "inputbudget",
             "conditions": "is_going_to_inputbudget",
         },
