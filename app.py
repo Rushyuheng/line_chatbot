@@ -8,7 +8,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 from fsm import TocMachine
-from utils import send_text_message
+from utils import send_text_message, send_button_message
 
 load_dotenv()
 
@@ -36,7 +36,7 @@ machine = TocMachine(
         {
             "trigger": "advance",
             "source": "newitemtolist",
-            "dest": "inputitemname",
+			"dest": "inputitemname",
             "conditions": "is_going_to_inputitemname",
         },
         {
@@ -94,7 +94,7 @@ machine = TocMachine(
             "trigger": "advance",
             "source": "realexpense",
             "dest": "shopping",
-            "conditions": "back_to_shopping",
+            "conditions": "check_and_goto_shopping",
         },
 		# end cycle
 		
@@ -107,12 +107,6 @@ machine = TocMachine(
         },
 
 		#realexpense node
-        {
-            "trigger": "advance",
-            "source": "realexpense",
-            "dest": "shopping",
-            "conditions": "check_and_goto_shopping",
-        },
         {
             "trigger": "advance",
             "source": "realexpense",
