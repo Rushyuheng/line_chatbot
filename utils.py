@@ -1,8 +1,7 @@
 import os
 
 from linebot import LineBotApi, WebhookParser
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
-
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, ImageCarouselColumn, ImageCarouselTemplate, URITemplateAction, ButtonsTemplate, MessageTemplateAction, ImageSendMessage
 
 channel_access_token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN", None)
 
@@ -21,6 +20,7 @@ def send_button_message(reply_token, title, text, btn, url):
         template = ButtonsTemplate(
             title = title,
             text = text,
+			imageSize = "contain",
             thumbnail_image_url = url,
             actions = btn
         )

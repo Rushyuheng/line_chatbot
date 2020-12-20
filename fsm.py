@@ -1,7 +1,7 @@
 from transitions.extensions import GraphMachine
 
 from utils import send_text_message,send_button_message
-
+from linebot.models import MessageTemplateAction
 # golbal variable
 totallist = []
 tobuylist = []
@@ -34,7 +34,7 @@ class TocMachine(GraphMachine):
 		#restart and clear list
 		global totallist
 		global tobuylist
-		totalist.clear()
+		totallist.clear()
 		tobuylist.clear()
 
 		title = '請選擇新增購物清單或去購物'
@@ -49,7 +49,7 @@ class TocMachine(GraphMachine):
 				text = '去購物'
 			),
 		]
-		url = 'https://i.imgur.com/d23V3Oy.png'
+		url = 'https://i.imgur.com/m7S2P3t.png'
 		send_button_message(event.reply_token, title, text, btn, url)
 
 	def is_going_to_shopping(self,event):
@@ -61,6 +61,7 @@ class TocMachine(GraphMachine):
 
 	def on_enter_shopping(self,event):
 		##TODO
+		return True
 
 	def is_going_to_newitemtolist(self,event):
 		text = event.message.text
@@ -73,8 +74,9 @@ class TocMachine(GraphMachine):
 		send_text_message(event.reply_token, '請輸入要購買的項目名稱：')
 
 	def is_going_to_inputitemname(self,event):
+		global name
 		text = event.message.text
-		if not text: # not empty string
+		if text != '': # not empty string
 			name = text
 			return True
 		else:
@@ -84,10 +86,6 @@ class TocMachine(GraphMachine):
 		title = '請選擇單位'
 		text = '選擇物品單位'
 		btn = [
-			MessageTemplateAction(
-				label = '公斤',
-				text ='公斤'
-			),
 			MessageTemplateAction(
 				label = '台斤',
 				text = '台斤'
@@ -106,12 +104,13 @@ class TocMachine(GraphMachine):
 			),
 
 		]
-		url = 'https://i.imgur.com/m51E7P5.png'
+		url = 'https://i.imgur.com/yj8WSSL.png'
 		send_button_message(event.reply_token, title, text, btn, url)
 
 	def is_going_to_chooseunit(self,event):
+		global unit
 		text = event.message.text
-		if text == '公斤' or text == '台斤' or text == '公克' or text == '條' or text == '顆': 
+		if text == '台斤' or text == '公克' or text == '條' or text == '顆': 
 			unit = text
 			return True
 		else:
@@ -161,21 +160,22 @@ class TocMachine(GraphMachine):
 				text = '取消新增'
 			),
 		]
-		url = 'https://i.imgur.com/fb1fQKX.png'
+		url = 'https://i.imgur.com/6IRRt2s.png'
 		send_button_message(event.reply_token, title, text, btn, url)
 
 	def confirm_add_item(self,event):
 		global tobuylist
 		global newitem
+		text = event.message.text
 		if text == '確認新增': 
 			tobuylist.append(newitem)
 			return True
-		elif text == '取消新增'
+		elif text == '取消新增':
 			#don't add item to list wait for next override
 			return True
 		else:
 			return False
-
+	'''
 	def is_going_to_showlist(self,event):
 
 	def on_enter_showlist(self,event):
@@ -217,7 +217,7 @@ class TocMachine(GraphMachine):
 	def is_going_to_goodend(self,event):
 
 	def on_enter_goodend(self,event):
-
+	'''
 
 		
 
