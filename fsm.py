@@ -5,7 +5,7 @@ from linebot.models import MessageTemplateAction
 # golbal variable
 totallist = []
 tobuylist = []
-newitem = ['','','','']
+newitem = ['','',0,0]
 name = ''
 unit = ''
 number = 0
@@ -21,22 +21,21 @@ class TocMachine(GraphMachine):
 		return True
 
 	def on_enter_start(self,event):
-		send_text_message(event.reply_token, '歡迎使用買菜助手,輸入『start』即可開始使用買菜助手。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到當下的狀態圖。')
-
-	def is_going_to_makelist(self,event):
-		text = event.message.text
-		if text == 'start':
-			return True
-		else:
-			return False
-
-	def on_enter_makelist(self,event):
 		#restart and clear list
 		global totallist
 		global tobuylist
 		totallist.clear()
 		tobuylist.clear()
+		send_text_message(event.reply_token, '歡迎使用買菜助手,輸入『start』即可開始使用買菜助手。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到當下的狀態圖。')
 
+	def is_going_to_makelist(self,event):
+		text = event.message.text
+		if text == 'start' or text == 'back':
+			return True
+		else:
+			return False
+
+	def on_enter_makelist(self,event):
 		title = '請選擇新增購物清單或去購物'
 		text = '新增項目至購物清單,若已新增完畢則選擇『去購物』'
 		btn = [
@@ -45,12 +44,31 @@ class TocMachine(GraphMachine):
 				text ='新增項目'
 			),
 			MessageTemplateAction(
+				label = '檢視清單',
+				text = '檢視清單'
+			),
+			MessageTemplateAction(
 				label = '去購物',
 				text = '去購物'
 			),
 		]
 		url = 'https://i.imgur.com/m7S2P3t.png'
 		send_button_message(event.reply_token, title, text, btn, url)
+
+	def is_going_to_showmakelist(self,event):
+		text = event.message.text
+		if text == '檢視清單':
+			return True
+		else:
+			return False
+
+	def on_enter_showmakelist(self,event):
+		global tobuylist
+		replytext = '清單內容：\n名稱  數量  預算  \n'
+		for item in tobuylist:
+			replytext += item[0] + ' ' + str(item[2]) + ' ' + item[1] + ' ' + str(item[3]) + '元\n'
+		replytext +='輸入『back』以結束檢視清單'
+		send_text_message(event.reply_token, replytext)
 
 	def is_going_to_shopping(self,event):
 		text = event.message.text
@@ -167,11 +185,13 @@ class TocMachine(GraphMachine):
 		global tobuylist
 		global newitem
 		text = event.message.text
-		if text == '確認新增': 
-			tobuylist.append(newitem)
+		if text == '確認新增':
+			tobuylist.append(newitem[:]) #pass by value not reference
+			print(tobuylist)
 			return True
 		elif text == '取消新增':
 			#don't add item to list wait for next override
+			print(tobuylist)
 			return True
 		else:
 			return False
