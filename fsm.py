@@ -36,7 +36,7 @@ class TocMachine(GraphMachine):
 			return False
 
 	def on_enter_makelist(self,event):
-		title = '請選擇新增購物清單或去購物'
+		title = '請選擇新增購物清單、檢視清單或去購物'
 		text = '新增項目至購物清單,若已新增完畢則選擇『去購物』'
 		btn = [
 			MessageTemplateAction(
@@ -78,8 +78,24 @@ class TocMachine(GraphMachine):
 			return False
 
 	def on_enter_shopping(self,event):
-		##TODO
-		return True
+		title = '請選擇新增已買物品、檢視清單或結束購物'
+		text = '新增項目至已買清單,若購物完畢則選擇『結束購物』'
+		btn = [
+			MessageTemplateAction(
+				label = '新增已買項目',
+				text ='新增已買項目'
+			),
+			MessageTemplateAction(
+				label = '檢視清單',
+				text = '檢視清單'
+			),
+			MessageTemplateAction(
+				label = '結束購物',
+				text = '結束購物'
+			),
+		]
+		url = 'https://i.imgur.com/a0FOukY.png'
+		send_button_message(event.reply_token, title, text, btn, url)
 
 	def is_going_to_newitemtolist(self,event):
 		text = event.message.text
@@ -195,23 +211,53 @@ class TocMachine(GraphMachine):
 			return True
 		else:
 			return False
-	'''
+		
 	def is_going_to_showlist(self,event):
+		text = event.message.text
+		if text == '檢視清單': 
+			return True
+		else:
+			return False
 
+	
 	def on_enter_showlist(self,event):
-
+		#TODO complex
 	def back_to_shopping(self,event):
+		text = event.message.text
+		if text == '繼續購物': 
+			return True
+		else:
+			return False
 
 	def is_going_to_addnewbuyitem(self,event):
-
+		text = event.message.text
+		if text == '新增已買項目': 
+			return True
+		else:
+			return False
+	
 	def on_enter_addnewbuyitem(self,event):
+		send_text_message(event.reply_token, '請輸入已購買的項目名稱：')
 
 	def is_going_to_buyitemname(self,event):
+		global name
+		text = event.message.text
+		if text != '': # not empty string
+			name = text
+			return True
+		else:
+			return False
 
 	def on_enter_buyitemname(self,event):
-
+		send_text_message(event.reply_token, '請輸入實際花費（整數限定）：')
 	def is_going_to_realexpense(self,event):
-
+		global price
+		text = event.message.text
+		if text.lower().isnumeric():
+			price = int(text)
+			return True
+		return False
+	'''
 	def on_enter_realexpense(self,event):
 	
 	def check_and_goto_shopping(self,event):
@@ -237,7 +283,7 @@ class TocMachine(GraphMachine):
 	def is_going_to_goodend(self,event):
 
 	def on_enter_goodend(self,event):
-	'''
+	'''	
 
 		
 
