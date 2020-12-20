@@ -14,8 +14,8 @@ price = 0
 
 
 class TocMachine(GraphMachine):
-    def __init__(self, **machine_configs):
-        self.machine = GraphMachine(model=self, **machine_configs)
+	def __init__(self, **machine_configs):
+		self.machine = GraphMachine(model=self, **machine_configs)
 	#user input anything to start
 	def is_going_to_start(self,event):
 		return True
