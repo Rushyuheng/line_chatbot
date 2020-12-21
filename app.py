@@ -14,7 +14,7 @@ load_dotenv()
 
 
 machine = TocMachine(
-	states=["user" ,"start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" ,"showmakelist" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","finishremind" ,"dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
+	states=["user" ,"start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" ,"showmakelist" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","check" ,"finishremind" ,"dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
 	transitions=[
 		# user to start
 		{
@@ -129,9 +129,16 @@ machine = TocMachine(
 		{
 			"trigger": "advance",
 			"source": "realexpense",
+			"dest": "check",
+			"conditions": "is_going_to_check",
+		},
+		{
+			"trigger": "advance",
+			"source": "check",
 			"dest": "shopping",
 			"conditions": "check_and_goto_shopping",
 		},
+
 		# end cycle
 		
 		#shopping to endshopping
@@ -145,13 +152,13 @@ machine = TocMachine(
 		#realexpense node
 		{
 			"trigger": "advance",
-			"source": "realexpense",
+			"source": "check",
 			"dest": "finishremind",
 			"conditions": "is_going_to_finishremind",
 		},
 		{
 			"trigger": "advance",
-			"source": "realexpense",
+			"source": "check",
 			"dest": "dangerous",
 			"conditions": "overbudget",
 		},
