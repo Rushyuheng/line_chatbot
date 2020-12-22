@@ -14,7 +14,7 @@ load_dotenv()
 
 
 machine = TocMachine(
-	states=["user" ,"start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" ,"showmakelist" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","check" ,"finishremind" ,"dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
+	states=["user" ,"start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" ,"showmakelist" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","check" ,"finishremind" ,"dangerousprice","dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
 	transitions=[
 		# user to start
 		{
@@ -160,6 +160,12 @@ machine = TocMachine(
 			"trigger": "advance",
 			"source": "check",
 			"dest": "dangerous",
+			"conditions": "listunmatch",
+		},
+		{
+			"trigger": "advance",
+			"source": "check",
+			"dest": "dangerousprice",
 			"conditions": "overbudget",
 		},
 		#end of node
@@ -194,7 +200,15 @@ machine = TocMachine(
 			"conditions": "is_going_to_goodend",
 		},
 		#end of node
-		
+
+		#dangerousprice to callNcheck
+		{
+			"trigger": "advance",
+			"source": "dangerousprice",
+			"dest": "callNcheck",
+			"conditions": "is_going_to_callNcheck",
+		},
+
 		#dangerous to callNcheck
 		{
 			"trigger": "advance",
@@ -213,7 +227,7 @@ machine = TocMachine(
 		
 		# restart
 		{	"trigger": "go_back",
-			"source": ["user" ,"start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" ,"showmakelist" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","finishremind" ,"dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
+			"source":["user" ,"start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" ,"showmakelist" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","check" ,"finishremind" ,"dangerousprice","dangerous" , "endshopping" ,"goodend" ,"callNcheck"],		
 			"dest": "start"
 		},
 		

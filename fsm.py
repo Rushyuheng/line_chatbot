@@ -27,7 +27,7 @@ class TocMachine(GraphMachine):
 		global tobuylist
 		extralist.clear()
 		tobuylist.clear()
-		send_text_message(event.reply_token, '歡迎使用買菜助手,輸入『start』即可開始使用買菜助手。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到當下的狀態圖。')
+		send_text_message(event.reply_token, '歡迎使用採購小幫手,輸入『start』即可開始。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到當下的狀態圖。')
 
 	def is_going_to_makelist(self,event):
 		text = event.message.text
@@ -313,7 +313,7 @@ class TocMachine(GraphMachine):
 			return False
 	def on_enter_check(self,event):
 		title = '選擇檢查以確認是否仍有項目需購賣'
-		text = '同時檢查是否回去會有被念的風險'
+		text = '如果購物清單尚未完成會自動進入購物模式，請選擇查看清單以確認尚缺哪些項目'
 		btn = [
 			MessageTemplateAction(
 				label = '檢查',
@@ -325,10 +325,11 @@ class TocMachine(GraphMachine):
 	def check_and_goto_shopping(self,event):
 		global tobuylist
 		text = event.message.text
-		if text == '檢查' and not tobuylist and not buyextra and newbuyitem[1] <= newitem[3] * 1.5: 
+		if text == '檢查' and tobuylist and not buyextra and newbuyitem[1] <= newitem[3] * 1.5: 
 			return True
 		else:
 			return False
+
 	def is_going_to_endshopping(self,event):
 		text = event.message.text
 		if text == '結束購物': 
@@ -337,17 +338,12 @@ class TocMachine(GraphMachine):
 			return False
 
 	def on_enter_endshopping(self,event):
-		## TODO need revision
-		title = '選擇檢查以確認是否仍有項目需購賣'
-		text = '同時檢查是否回去會有被念的風險'
+		title = '選擇結算以確認清單是否完全符合'
+		text = '超買或缺買都有被念的風險喔！'
 		btn = [
 			MessageTemplateAction(
-				label = '檢查',
-				text ='檢查'
-			),
-			MessageTemplateAction(
-				label = '檢查',
-				text ='檢查'
+				label = '結算',
+				text = '結算'
 			),
 		]
 		url = 'https://i.imgur.com/VWYK4JJ.png'
@@ -356,7 +352,7 @@ class TocMachine(GraphMachine):
 	def is_going_to_finishremind(self,event):
 		global tobuylist
 		text = event.message.text
-		if text == '檢查' and tobuylist and not buyextra and newbuyitem[1] <= newitem[3] * 1.5: 
+		if text == '檢查' and not tobuylist and not buyextra and newbuyitem[1] <= newitem[3] * 1.5: 
 			return True
 		else:
 			return False
@@ -378,26 +374,66 @@ class TocMachine(GraphMachine):
 	def overbudget(self,event):
 		global tobuylist
 		text = event.message.text
-		if text == '檢查' and (buyextra or newbuyitem[1] >= newitem[3] * 1.5): 
+		if text == '檢查' and not buyextra and newbuyitem[1] >= newitem[3] * 1.5: 
 			return True
 		else:
 			return False
+
 	def on_enter_dangerous(self,event):
+		send_text_message(event.reply_token, '購物內容與購物清單不吻合\n可能有超買或缺買的情形\n建議致電皇太后詢問指示以免挨念\n閱讀後請輸入『我知道了』代表您已了解風險')
 
 	def warning(self,event):
+		global tobuylist
+		global extralist
+		text = event.message.text
+		if text == '結算' and (extralist or tobuylist): 
+			return True
+		else:
+			return False
+
+	def on_enter_dangerousprice(self,event):
+		global newbuyitem
+		global newitem
+		sendtext = '實際消費已超過預算的1.5倍\n' + 
+		'物品內容：' + newbuyitem[0] + '\n' + 
+		'預算：' + str(newitem[3]) + '\n' +
+		'實際金額：' + str(newbuyitem[1]) + '\n' +
+		'建議致電皇太后詢問指示以免挨念\n閱讀後請輸入『我知道了』代表您已了解風險'
+		send_text_message(event.reply_token,snedtext) 
+
+	def listunmatch(self,event):
+		text = event.message.text
+		if text == '檢查' and  buyextra: #add a extra item  
+			return True
+		else:
+			return False
 
 	def is_going_to_callNcheck(self,event):
+		text = event.message.text
+		if text == '我知道了':  
+			return True
+		else:
+			return False
 
 	def on_enter_callNcheck(self,event):
+		title = '致電皇太后尋求指示後選擇繼續購物'
+		text = '強烈建議致電詢問，自作主張有高機率回去挨念喔'
+		btn = [
+			MessageTemplateAction(
+				label = '繼續購物',
+				text ='繼續購物'
+			),
+		]
+		url = 'https://i.imgur.com/JIwdwBR.png'
+		send_button_message(event.reply_token, title, text, btn, url)
 
 	def is_going_to_goodend(self,event):
+		text = event.message.text
+		if text == '結算' and not extralist and not tobuylist : #no extra item and tobuylist is empty
+			return True
+		else:
+			return False
 
 	def on_enter_goodend(self,event):
-	'''	
-
-		
-
-		
-
-		
+	send_text_message(event.reply_token, '已圓滿完成購物，感謝您使用採購小幫手，希望您今日有個不挨念美好的一天\n輸入『restart』以重新開始')	
 
