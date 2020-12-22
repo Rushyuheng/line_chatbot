@@ -93,8 +93,9 @@ machine = TocMachine(
 			"dest": "makelist",
 			"conditions": "is_going_to_makelist",
 		},
-
 		#end cycle
+
+		#show list cycle
 		{
 			"trigger": "advance",
 			"source": "shopping",
@@ -107,6 +108,8 @@ machine = TocMachine(
 			"dest": "shopping",
 			"conditions": "back_to_shopping",
 		},
+		#end of cycle
+
 		# add new buy item cycle
 		{
 			"trigger": "advance",
@@ -149,13 +152,7 @@ machine = TocMachine(
 			"conditions": "is_going_to_endshopping",
 		},
 
-		#realexpense node
-		{
-			"trigger": "advance",
-			"source": "check",
-			"dest": "finishremind",
-			"conditions": "is_going_to_finishremind",
-		},
+		#check node
 		{
 			"trigger": "advance",
 			"source": "check",
@@ -168,6 +165,13 @@ machine = TocMachine(
 			"dest": "dangerousprice",
 			"conditions": "overbudget",
 		},
+		{
+			"trigger": "advance",
+			"source": "check",
+			"dest": "finishremind",
+			"conditions": "is_going_to_finishremind",
+		},
+
 		#end of node
 
 		#finishremind node
@@ -226,6 +230,13 @@ machine = TocMachine(
 		},
 		
 		# restart
+		{
+			"trigger": "advance",
+			"source": "goodend",
+			"dest": "start",
+			"conditions": "restart",
+		},
+
 		{	"trigger": "go_back",
 			"source":["user" ,"start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" ,"showmakelist" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","check" ,"finishremind" ,"dangerousprice","dangerous" , "endshopping" ,"goodend" ,"callNcheck"],		
 			"dest": "start"
@@ -308,7 +319,7 @@ def webhook_handler():
 		response = machine.advance(event)
 		if response == False:
 			if event.message.text.lower() == 'fsm':
-				send_image_message(event.reply_token, 'https://jamesyhh.herokuapp.com/show-fsm')
+				send_image_message(event.reply_token, 'https://46e9fc67517d.ngrok.io/show-fsm')
 			elif machine.state != 'user' and event.message.text.lower() == 'restart':
 				send_text_message(event.reply_token, '輸入『start』即可開始使用買菜助手。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到當下的狀態圖。')
 				machine.go_back()

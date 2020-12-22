@@ -6,7 +6,7 @@ from linebot.models import MessageTemplateAction
 extralist = []
 tobuylist = []
 newitem = ['','',0,0]
-newbutitem = ['',0]
+newbuyitem = ['',0]
 name = ''
 unit = ''
 number = 0
@@ -112,6 +112,7 @@ class TocMachine(GraphMachine):
 		global name
 		text = event.message.text
 		if text != '': # not empty string
+			text = text.replace(' ','')# remove blank
 			name = text
 			return True
 		else:
@@ -218,13 +219,28 @@ class TocMachine(GraphMachine):
 		else:
 			return False
 
-	
 	def on_enter_showlist(self,event):
-		#TODO complex
+		global tobuylist
+		global extralist
+		replytext = ''
+		if tobuylist:
+			replytext += '清單尚餘：\n名稱  數量  預算  \n'
+			for item in tobuylist:
+				replytext += item[0] + ' ' + str(item[2]) + ' ' + item[1] + ' ' + str(item[3]) + '元\n'
+
+		if extralist:
+			replytext += '額外購買：\n名稱  金額  \n'
+			for item in extralist:
+				replytext += item[0] + ' ' + str(item[1]) + '元\n'
+
+		if not extralist and not tobuylist:
+			replytext += '清單已空\n請輸入『back』後選擇結束購物\n'
+		replytext +='輸入『back』以結束檢視清單'
+		send_text_message(event.reply_token, replytext)
 
 	def back_to_shopping(self,event):
 		text = event.message.text
-		if text == '繼續購物': 
+		if text == '繼續購物' or text == 'back': 
 			return True
 		else:
 			return False
@@ -243,6 +259,7 @@ class TocMachine(GraphMachine):
 		global name
 		text = event.message.text
 		if text != '': # not empty string
+			text = text.replace(' ','')# remove blank
 			name = text
 			return True
 		else:
@@ -304,10 +321,11 @@ class TocMachine(GraphMachine):
 				buyextra = False
 			else:
 				extralist.append(newbuyitem[:]) #add item to extra list
-				buyextar = True
+				buyextra = True
 			return True
 		elif text == '取消新增':
 			#do nothing
+			buyextra = False
 			return True
 		else:
 			return False
@@ -324,6 +342,8 @@ class TocMachine(GraphMachine):
 		send_button_message(event.reply_token, title, text, btn, url)
 	def check_and_goto_shopping(self,event):
 		global tobuylist
+		global buyextra
+
 		text = event.message.text
 		if text == '檢查' and tobuylist and not buyextra and newbuyitem[1] <= newitem[3] * 1.5: 
 			return True
@@ -351,6 +371,8 @@ class TocMachine(GraphMachine):
 
 	def is_going_to_finishremind(self,event):
 		global tobuylist
+		global buyextra
+
 		text = event.message.text
 		if text == '檢查' and not tobuylist and not buyextra and newbuyitem[1] <= newitem[3] * 1.5: 
 			return True
@@ -371,8 +393,10 @@ class TocMachine(GraphMachine):
 		]
 		url = 'https://i.imgur.com/nKh2NYg.png'
 		send_button_message(event.reply_token, title, text, btn, url)
+
 	def overbudget(self,event):
 		global tobuylist
+		global buyextra
 		text = event.message.text
 		if text == '檢查' and not buyextra and newbuyitem[1] >= newitem[3] * 1.5: 
 			return True
@@ -394,16 +418,12 @@ class TocMachine(GraphMachine):
 	def on_enter_dangerousprice(self,event):
 		global newbuyitem
 		global newitem
-		sendtext = '實際消費已超過預算的1.5倍\n' + 
-		'物品內容：' + newbuyitem[0] + '\n' + 
-		'預算：' + str(newitem[3]) + '\n' +
-		'實際金額：' + str(newbuyitem[1]) + '\n' +
-		'建議致電皇太后詢問指示以免挨念\n閱讀後請輸入『我知道了』代表您已了解風險'
-		send_text_message(event.reply_token,snedtext) 
+		sendtext = '實際消費已超過預算的1.5倍\n' + '物品內容：' + newbuyitem[0] + '\n' + '預算：' + str(newitem[3]) + '\n' +'實際金額：' + str(newbuyitem[1]) + '\n' +'建議致電皇太后詢問指示以免挨念\n閱讀後請輸入『我知道了』代表您已了解風險'
+		send_text_message(event.reply_token,sendtext) 
 
 	def listunmatch(self,event):
 		text = event.message.text
-		if text == '檢查' and  buyextra: #add a extra item  
+		if text == '檢查' and buyextra: #add a extra item  
 			return True
 		else:
 			return False
@@ -435,5 +455,10 @@ class TocMachine(GraphMachine):
 			return False
 
 	def on_enter_goodend(self,event):
-	send_text_message(event.reply_token, '已圓滿完成購物，感謝您使用採購小幫手，希望您今日有個不挨念美好的一天\n輸入『restart』以重新開始')	
-
+		send_text_message(event.reply_token, '已採購完成清單項目，感謝您使用採購小幫手，希望您今日有個不挨念美好的一天\n輸入『restart』以重新開始')	
+	def restart(self,event):
+		text = event.message.text
+		if text == 'restart':
+			return True
+		else:
+			return False
