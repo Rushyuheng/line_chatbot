@@ -319,7 +319,7 @@ def webhook_handler():
 		response = machine.advance(event)
 		if response == False:
 			if event.message.text.lower() == 'fsm':
-				send_image_message(event.reply_token, 'https://46e9fc67517d.ngrok.io/show-fsm')
+				send_image_message(event.reply_token, 'https://shopping-helper-toc.herokuapp.com/show-fsm')
 			elif machine.state != 'user' and event.message.text.lower() == 'restart':
 				send_text_message(event.reply_token, '輸入『start』即可開始使用買菜助手。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到當下的狀態圖。')
 				machine.go_back()
