@@ -27,7 +27,7 @@ class TocMachine(GraphMachine):
 		global tobuylist
 		extralist.clear()
 		tobuylist.clear()
-		send_text_message(event.reply_token, '歡迎使用採購小幫手,輸入『start』即可開始。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到當下的狀態圖。')
+		send_text_message(event.reply_token, '歡迎使用採購小幫手,輸入『start』即可開始。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到狀態圖。')
 
 	def is_going_to_makelist(self,event):
 		text = event.message.text

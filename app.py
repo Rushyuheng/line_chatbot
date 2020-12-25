@@ -322,7 +322,7 @@ def webhook_handler():
 			if event.message.text.lower() == 'fsm':
 				send_image_message(event.reply_token, 'https://shopping-helper-toc.herokuapp.com/show-fsm')
 			elif machine.state != 'user' and event.message.text.lower() == 'restart':
-				send_text_message(event.reply_token, '輸入『start』即可開始使用買菜助手。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到當下的狀態圖。')
+				send_text_message(event.reply_token, '輸入『start』即可開始使用買菜助手。\n隨時輸入『restart』可以重新開始。\n隨時輸入『fsm』可以得到狀態圖。')
 				machine.go_back()
 			else:
 				send_text_message(event.reply_token, "我不了解你在說什麼,請再試一次")
@@ -332,8 +332,8 @@ def webhook_handler():
 
 @app.route("/show-fsm", methods=["GET"])
 def show_fsm():
-	machine.get_graph().draw("fsm.png", prog="dot", format="png")
-	return send_file("fsm.png", mimetype="image/png")
+	#machine.get_graph().draw("fsm.png", prog="dot", format="png")
+	return send_file("./fsm.png", mimetype="image/png")
 
 
 if __name__ == "__main__":
