@@ -36,16 +36,6 @@ class TocMachine(GraphMachine):
 		else:
 			return False
 
-	def is_going_to_preparelist(self,event):
-		text = event.message.text
-		if text == 'gogo':
-			return True
-		else:
-			return False
-
-	def on_enter_preparelist(self,event):
- 		send_text_message(event.reply_token, 'welcome enter \'start\' to continue')
-	   
 	def on_enter_makelist(self,event):
 		title = '請選擇新增購物清單、檢視清單或去購物'
 		text = '新增項目至購物清單,若已新增完畢則選擇『去購物』'
