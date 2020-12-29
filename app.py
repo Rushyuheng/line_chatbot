@@ -15,7 +15,7 @@ load_dotenv()
 
 
 machine = TocMachine(
-	states=["user" ,"start" , "makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" ,"showmakelist" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","check" ,"finishremind" ,"dangerousprice","dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
+	states=["user" ,"start" , "preparelist","makelist" ,"newitemtolist" ,"inputitemname" ,"chooseunit" ,"inputnumber","inputbudget" ,"showmakelist" , "shopping" ,"showlist" ,"addnewbuyitem" ,"buyitemname" ,"realexpense","check" ,"finishremind" ,"dangerousprice","dangerous" , "endshopping" ,"goodend" ,"callNcheck"],
 	transitions=[
 		# user to start
 		{
@@ -29,6 +29,14 @@ machine = TocMachine(
 		{
 			"trigger": "advance",
 			"source": "start",
+			"dest": "preparelist",
+			"conditions": "is_going_to_preparelist",
+		},
+
+		# start to makelist
+		{
+			"trigger": "advance",
+			"source": "preparelist",
 			"dest": "makelist",
 			"conditions": "is_going_to_makelist",
 		},
